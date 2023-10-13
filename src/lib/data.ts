@@ -1,7 +1,7 @@
 export interface Data {
+  id: string;
   snippetTitle: string;
   upvotes: number;
-  downvotes: number;
   created: string;
   modified: string;
   code: string;

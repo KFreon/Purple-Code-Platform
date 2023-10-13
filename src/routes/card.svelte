@@ -1,6 +1,6 @@
 <script lang="ts">
   export let data: Data;
-
+	export let onDelete: (data: Data) => void;
 
 	import { onDestroy, onMount } from 'svelte';
 	import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
@@ -15,23 +15,20 @@
 		monaco = (await import('../lib/monaco')).default;
 
 		// Your monaco instance is ready, let's display some code!
-		const editor = monaco.editor.create(editorContainer);
-		const model = monaco.editor.createModel(
-			data.code, 'javascript'
-		);
+		editor = monaco.editor.create(editorContainer, {automaticLayout: true});
+		const model = monaco.editor.createModel(data.code, 'javascript');
 		editor.setModel(model);
 	});
 
 	onDestroy(() => {
-		monaco?.editor.getModels().forEach((model) => model.dispose());
+		editor?.getModel()?.dispose();
 		editor?.dispose();
 	});
 </script>
 
 <div class="card">
 	<div class="title-area">
-		<input type="text" placeholder="Snippet name" value="{data.snippetTitle}" readonly />
-		<span>✏️</span>
+		<input type="text" placeholder="Snippet name" value="{data.snippetTitle}" />
 		<div class="details">
 			<p>
 				<span>Created: {data.created}</span>
@@ -39,8 +36,8 @@
 			</p>
 			<p>
 				<span>👍 {data.upvotes}</span>
-				<span>👎 {data.downvotes}</span>
 			</p>
+			<button class='close-button' on:click={() => onDelete(data)}>❌</button>
 		</div>
 	</div>
 	<div class="card-code">
@@ -50,6 +47,7 @@
 			<ul>
 				<li><textarea /></li>
 			</ul>
+			<button>Save comment? Have blank input?</button>
 		</div>
 	</div>
   <button class='save-button'>Save changes</button>
