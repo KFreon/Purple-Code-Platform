@@ -1,6 +1,7 @@
 <script lang="ts">
   export let data: Data;
 	export let onDelete: (data: Data) => void;
+	export let onSave: (data: Data) => void;
 
 	import { onDestroy, onMount } from 'svelte';
 	import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
@@ -28,11 +29,11 @@
 
 <div class="card">
 	<div class="title-area">
-		<input type="text" placeholder="Snippet name" value="{data.snippetTitle}" />
+		<input type="text" placeholder="Snippet name" value="{data.title}" />
 		<div class="details">
 			<p>
-				<span>Created: {data.created}</span>
-				<span>Modified: {data.modified}</span>
+				<span>Created: {data.createdOn}</span>
+				<span>Modified: {data.modifiedOn}</span>
 			</p>
 			<p>
 				<span>👍 {data.upvotes}</span>
@@ -50,7 +51,7 @@
 			<button>Save comment? Have blank input?</button>
 		</div>
 	</div>
-  <button class='save-button'>Save changes</button>
+  <button class='save-button' on:click={() => onSave(data)}>Save changes</button>
 </div>
 
 <style src="./card.css"></style>

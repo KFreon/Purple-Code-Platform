@@ -11,7 +11,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
+  padding: 0;
   background-color: rgba(211, 211, 211, 0.212);
 }
 
@@ -30,4 +30,33 @@
   color: white;
   border: none;
   border-radius: 5px;
+}
+
+.loading {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.75);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading p {
+  font-size: 2rem;
+  animation-duration: 1s;
+  animation-delay: 1s;
+  animation-name: loadingAnim;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes loadingAnim {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.5);
+  }
 }

@@ -1,9 +1,9 @@
 export interface Data {
   id: string;
-  snippetTitle: string;
+  title: string;
   upvotes: number;
-  created: string;
-  modified: string;
+  createdOn: string;
+  modifiedOn: string;
   code: string;
   comments: string[];
 }

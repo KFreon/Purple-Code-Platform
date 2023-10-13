@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+  purplecodeplatform:
+    image: ${DOCKER_REGISTRY-}purplecodeplatform
+    build:
+      context: .
+      dockerfile: PurpleCodePlatform/Dockerfile
+    environment:
+     - COSMOS_ENDPOINT=https://cosmosDB:8081
+     - COSMOS_KEY=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==
+    ports:
+     - 5001:443
+     - 5000:80
+  cosmosDB:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
+    tty: true
+    restart: always
+    cpu_count: 2
+    mem_limit: 2G
+    ports:
+     - 8081:8018
+     - 10250-10255:10250-10255
+    volumes:
+     - vol_cosmos:/mounts/cosmos
+
+volumes:
+  vol_cosmos:
