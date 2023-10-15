@@ -1,4 +1,6 @@
-﻿using Microsoft.Azure.Cosmos;
+﻿using System.Text;
+using System.Text.Json;
+using Microsoft.Azure.Cosmos;
 
 public class CosmosDbService
 {
@@ -26,7 +28,8 @@ public class CosmosDbService
                 ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
             }),
             ConnectionMode = ConnectionMode.Gateway,
-            LimitToEndpoint = true
+            LimitToEndpoint = true,
+            Serializer = new CosmosSystemTextJsonSerializer(new JsonSerializerOptions(JsonSerializerDefaults.Web))
         } : new();
 
         var cosmosClient = new CosmosClient(
@@ -72,7 +75,7 @@ public class CosmosDbService
     public async Task Upsert(Snippet snippet)
     {
         var (container, client) = await GetContainer(CosmosDbName, SnippetContainerName, SnippetsPartitionKey);
-        await container.UpsertItemAsync(snippet, new PartitionKey(snippet.Id));
+        await container.UpsertItemAsync(snippet);
         client.Dispose();
     }
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Data } from '$lib/data';
 	import { onMount } from 'svelte';
-	import Card from './card.svelte';
+	import Card from '$lib/components/card/card.svelte';
 
 	let cards: Data[] = [];
 
@@ -20,6 +20,7 @@
 
 	const emptyCardData: Data = {
 		id: new Date().toISOString(),
+		languageId: 'plaintext',
 		upvotes: 0,
 		code: '',
 		comments: [],
@@ -64,7 +65,9 @@
   <button class="new-button" on:click={addNewSnippet}>Add new</button>
 	<ul class="code-area">
 		{#each cards as card (card.id)} <!-- keyed so we can prepend -->
-			<Card data={card} onDelete={(item) => deleteSnippet(item)} onSave={(item) => saveSnippet(item)} />
+			<li>
+				<Card data={card} onDelete={(item) => deleteSnippet(item)} onSave={(item) => saveSnippet(item)} />
+			</li>
 		{/each}
 	</ul>
   {/await}

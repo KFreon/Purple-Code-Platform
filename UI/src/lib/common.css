@@ -1,8 +1,11 @@
-button {
-  cursor: pointer;
+* {
+  box-sizing: border-box;
 }
 
-p, h1, h2, h3, input[type='text'] {
+p, h1, h2, h3, input[type='text'], li {
   font-family: 'Arial';
-  box-sizing: border-box;
+}
+
+button {
+cursor: pointer;
 }

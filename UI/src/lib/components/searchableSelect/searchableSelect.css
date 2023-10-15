@@ -1,0 +1,53 @@
+@import '$lib/common.css';
+
+.searchable-select {
+  position: relative;
+}
+
+input[type='text'] {
+  padding: 0.5rem 1rem;
+  border: 1px solid grey;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+}
+
+.inline-button {
+  background-color: transparent;
+  padding: 0.5rem 1rem;
+  border: 1px solid grey;
+  border-radius: 5px;
+  text-transform: capitalize;
+}
+
+.popout-options {
+  display: none;
+  position: absolute;
+  z-index: 10;
+  background: white;
+  border: 1px solid darkgray;
+  border-radius: 5px;
+  margin-top: 5px;
+  padding: 5px 10px;
+  box-shadow: 0 0 5px 0 grey;
+}
+
+.scrollable-container {
+  position: relative;
+  overflow: auto;
+  max-height: 20rem;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  padding: 4px;
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
+li:hover {
+  background: lightblue;
+}
