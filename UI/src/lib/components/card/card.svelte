@@ -8,6 +8,7 @@
 	import type { Data, SearchableItem } from '$lib/data';
 	import SearchableSelect from '../searchableSelect/searchableSelect.svelte';
 	import type monaco from '$lib/monaco';
+	import type { KeyboardEventHandler } from 'svelte/elements';
 	let editor: Monaco.editor.IStandaloneCodeEditor;
 	let monaco: typeof Monaco;
 	let editorContainer: HTMLElement;
@@ -44,6 +45,7 @@
 
 	const onItemSelected = (item: SearchableItem) => {
 		language = item;
+		data.languageId = language.value;
 		monaco.editor.setModelLanguage(model, item.name);
 		checkCanSave();
 	}
@@ -53,11 +55,17 @@
 		canSave = allDataExists;
 	}
 
+	const onTitleChange = (e: any) => {
+		// Correct the ID since it was a date before
+		data.id = data.title;
+		checkCanSave();
+	}
+
 	</script>
 
 <div class="card">
 	<div class="title-area">
-		<input type="text" placeholder="Snippet name" bind:value={data.title} on:change={() => checkCanSave()} />
+		<input type="text" placeholder="Snippet name" bind:value={data.title} on:keyup={onTitleChange} />
 		<SearchableSelect selectedItem={language} options={languages} placeholder="Select language..." onItemSelected={onItemSelected} />
 		<div></div>
 		<div class="details">

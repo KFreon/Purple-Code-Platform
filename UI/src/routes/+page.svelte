@@ -18,7 +18,7 @@
       });
   });
 
-	const emptyCardData: Data = {
+	const getEmptyCardData = ():Data => ({
 		id: new Date().toISOString(),
 		languageId: 'plaintext',
 		upvotes: 0,
@@ -27,19 +27,26 @@
 		createdOn: new Date().toLocaleDateString('en-au', {year: 'numeric', month: '2-digit', day: '2-digit'}),
 		modifiedOn: new Date().toLocaleDateString('en-au', {year: 'numeric', month: '2-digit', day: '2-digit'}),
 		title: ''
-	};
+	});
 
 	function addNewSnippet() {
-		cards = [emptyCardData, ...cards];
+		cards = [getEmptyCardData(), ...cards];
 	}
 
 	function deleteSnippet(data: Data) {
 		cards = cards.filter((x) => x.title !== data.title);
+
+		promise = fetch(`https://localhost:5001/snippets/${data.languageId}/{${data.id}}`, {
+      method: 'DELETE',
+      headers: {
+        "content-type": 'application/json'
+      }
+    })
 	}
 
   function saveSnippet(snippet: Data) {
-    console.log(snippet)
     snippet.id = snippet.title;
+		snippet.modifiedOn = new Date().toLocaleDateString('en-au', {year: 'numeric', month: '2-digit', day: '2-digit'});
     promise = fetch('https://localhost:5001/snippets', {
       method: 'POST',
       body: JSON.stringify(snippet),
@@ -63,13 +70,15 @@
   </div>
   {:then resp} 
   <button class="new-button" on:click={addNewSnippet}>Add new</button>
-	<ul class="code-area">
-		{#each cards as card (card.id)} <!-- keyed so we can prepend -->
-			<li>
-				<Card data={card} onDelete={(item) => deleteSnippet(item)} onSave={(item) => saveSnippet(item)} />
-			</li>
-		{/each}
-	</ul>
+	<div class='code-scroller'>
+		<ul class="code-area">
+			{#each cards as card (card.id)} <!-- keyed so we can prepend -->
+				<li>
+					<Card data={card} onDelete={(item) => deleteSnippet(item)} onSave={(item) => saveSnippet(item)} />
+				</li>
+			{/each}
+		</ul>
+	</div>
   {/await}
 </div>
 

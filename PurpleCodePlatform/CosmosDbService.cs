@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using Microsoft.Azure.Cosmos;
 
@@ -6,7 +7,7 @@ public class CosmosDbService
 {
     public const string CosmosDbName = "purple-code-platform";
     public const string SnippetContainerName = "snippets";
-    public const string SnippetsPartitionKey = "/id";
+    public const string SnippetsPartitionKey = "/languageId";
 
     public string Endpoint { get; init; }
     public string Key { get; init; }
@@ -76,6 +77,20 @@ public class CosmosDbService
     {
         var (container, client) = await GetContainer(CosmosDbName, SnippetContainerName, SnippetsPartitionKey);
         await container.UpsertItemAsync(snippet);
+        client.Dispose();
+    }
+
+    public async Task Delete(string id, string language)
+    {
+        var (container, client) = await GetContainer(CosmosDbName, SnippetContainerName, SnippetsPartitionKey);
+        try
+        {
+            await container.DeleteItemAsync<Snippet>(id, new PartitionKey(language));
+        } 
+        catch(Exception ex) when (ex.Message.Contains("NotFound"))
+        {
+            // Not found, don't really care about it then
+        }
         client.Dispose();
     }
 }

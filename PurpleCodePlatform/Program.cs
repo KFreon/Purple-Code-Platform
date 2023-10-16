@@ -48,9 +48,15 @@ app.MapPost("snippets", async (Snippet snippet, [FromServices] CosmosDbService c
     return Results.Ok();
 });
 
+app.MapDelete("snippets/{language}/{id}", async (string language, string id, [FromServices] CosmosDbService cosmos) =>
+{
+    await cosmos.Delete(id, language);
+    return Results.Ok();
+});
+
 app.Run();
 
 
 // TODO: Lol date only?
 // Not quite working in Net 7, pretty sure it's fixed in 8.
-public record Snippet([property: JsonPropertyName("id")] string Id, string Title, string Code, string LanguageId, int Upvotes, string CreatedOn, string ModifiedOn);  //TODO: Add comments?
+public record Snippet(string Id, string Title, string Code, string LanguageId, int Upvotes, string CreatedOn, string ModifiedOn);  //TODO: Add comments?
