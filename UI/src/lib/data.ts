@@ -8,8 +8,3 @@ export interface Data {
   comments: string[];
   languageId: string;
 }
-
-export interface SearchableItem {
-  name: string;
-  value: string;
-}

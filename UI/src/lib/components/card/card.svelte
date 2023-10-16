@@ -5,17 +5,16 @@
 
 	import { onDestroy, onMount } from 'svelte';
 	import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
-	import type { Data, SearchableItem } from '$lib/data';
+	import type { Data } from '$lib/data';
 	import SearchableSelect from '../searchableSelect/searchableSelect.svelte';
 	import type monaco from '$lib/monaco';
-	import type { KeyboardEventHandler } from 'svelte/elements';
+	import { store } from '$lib/store';
+
 	let editor: Monaco.editor.IStandaloneCodeEditor;
 	let monaco: typeof Monaco;
 	let editorContainer: HTMLElement;
 	let model: monaco.editor.ITextModel;
-
-	let languages: SearchableItem[] = [];
-	let language: SearchableItem | undefined;
+	let language: string | undefined;
 	let canSave: boolean = false;
 
 	onMount(async () => {
@@ -32,10 +31,11 @@
 			checkCanSave();
 		});
 
-		languages = monaco.languages.getLanguages().map(x => ({name: x.id, value: x.id}));
-		language = {name: data.languageId, value: data.languageId};
+		if ($store.languages.length === 0) {
+			store.set({...store, languages: monaco.languages.getLanguages().map(x => x.id)});
+		}
 
-		canSave = false;
+		language = data.languageId;
 	});
 
 	onDestroy(() => {
@@ -43,10 +43,10 @@
 		editor?.dispose();
 	});
 
-	const onItemSelected = (item: SearchableItem) => {
+	const onItemSelected = (item: string) => {
 		language = item;
-		data.languageId = language.value;
-		monaco.editor.setModelLanguage(model, item.name);
+		data.languageId = language;
+		monaco.editor.setModelLanguage(model, item);
 		checkCanSave();
 	}
 
@@ -66,7 +66,7 @@
 <div class="card">
 	<div class="title-area">
 		<input type="text" placeholder="Snippet name" bind:value={data.title} on:keyup={onTitleChange} />
-		<SearchableSelect selectedItem={language} options={languages} placeholder="Select language..." onItemSelected={onItemSelected} />
+		<SearchableSelect selectedItem={language} options={$store.languages} placeholder="Select language..." onItemSelected={onItemSelected} />
 		<div></div>
 		<div class="details">
 			<p>

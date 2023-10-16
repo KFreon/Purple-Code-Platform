@@ -17,6 +17,12 @@ input[type='text'] {
   border: 1px solid grey;
   border-radius: 5px;
   text-transform: capitalize;
+  min-width: 5rem;
+  height: 2rem;
+}
+
+.inline-button.empty {
+  color: gray;
 }
 
 .popout-options {
