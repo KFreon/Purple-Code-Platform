@@ -12,7 +12,7 @@
 
   onMount(() => {
     // Get data
-    promise = fetch('https://localhost:5001/snippets')
+    promise = fetch('/snippets')
       .then(resp => resp.json())
       .then(x => {
         cards = x;
@@ -38,7 +38,7 @@
 	function deleteSnippet(data: Data) {
 		cards = cards.filter((x) => x.title !== data.title);
 
-		promise = fetch(`https://localhost:5001/snippets/${data.languageId}/{${data.id}}`, {
+		promise = fetch(`/snippets/${data.languageId}/{${data.id}}`, {
       method: 'DELETE',
       headers: {
         "content-type": 'application/json'
@@ -49,7 +49,7 @@
   function saveSnippet(snippet: Data) {
     snippet.id = snippet.title;
 		snippet.modifiedOn = new Date().toLocaleDateString('en-au', {year: 'numeric', month: '2-digit', day: '2-digit'});
-    promise = fetch('https://localhost:5001/snippets', {
+    promise = fetch('/snippets', {
       method: 'POST',
       body: JSON.stringify(snippet),
       headers: {
