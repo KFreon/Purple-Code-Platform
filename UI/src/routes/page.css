@@ -1,7 +1,8 @@
 @import '$lib/common.css';
 
 .header {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto auto auto;
   width: 95%;
 }
 
@@ -47,7 +48,6 @@
 }
 
 .actions-container {
-  margin-bottom: 1rem;
   align-items: center;
   display: grid;
   grid-template-columns: auto 1fr 1fr;
@@ -101,8 +101,8 @@
 .theme-toggle {
   position: absolute;
   right: 1rem;
-  top: 1.5rem;
-  font-size: 4rem;
+  top: 0.5rem;
+  font-size: 3rem;
   border: none;
   background: transparent;
   transition: all 0.2s;

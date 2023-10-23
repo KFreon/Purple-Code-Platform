@@ -32,7 +32,7 @@
 		});
 
 		if ($store.languages.length === 0) {
-			store.set({...store, languages: monaco.languages.getLanguages().map(x => x.id)});
+			store.set({...$store, languages: monaco.languages.getLanguages().map(x => x.id)});
 		}
 
 		language = data.languageId;
