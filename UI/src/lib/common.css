@@ -1,5 +1,30 @@
+:root {
+  --text-primary: black;
+  --text-primary-inverted: white;
+  --background: rgba(211, 211, 211, 0.212);
+  --border-color: purple;
+  --text-light: gray;
+  --text-lighter: lightgray;
+  --main-button: purple;
+  --secondary-button: green;
+  --accent: pink;
+}
+
+:root .dark {
+  --text-primary: white;
+  --text-primary-inverted: black;
+  --background: rgba(0, 0, 0, 0.95);
+  --border-color: purple;
+  --text-light: gray;
+  --text-lighter: darkgray;
+  --main-button: purple;
+  --secondary-button: green;
+  --accent: purple;
+}
+
 * {
   box-sizing: border-box;
+  color: var(--text-primary);
 }
 
 p, h1, h2, h3, input[type='text'], li {

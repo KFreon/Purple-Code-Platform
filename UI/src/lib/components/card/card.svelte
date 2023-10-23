@@ -86,7 +86,10 @@
 			<p>TODO</p>
 		</div>
 	</div>
-  <button class='save-button' disabled={!canSave} on:click={() => onSave(data)}>Save changes</button>
+  <div class='bottom-area'>
+		<button class='save-button' disabled={!canSave} on:click={() => onSave(data)}>Save changes</button>
+		<p class='email'>{data.email}</p>
+	</div>
 </div>
 
 <style src="./card.css"></style>

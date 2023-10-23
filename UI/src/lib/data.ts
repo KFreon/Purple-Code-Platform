@@ -7,4 +7,5 @@ export interface Data {
   code: string | undefined;
   comments: string[];
   languageId: string;
+  email: string;
 }

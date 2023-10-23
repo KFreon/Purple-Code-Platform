@@ -1,13 +1,14 @@
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PurpleCodePlatform.Auth;
+using User = PurpleCodePlatform.Auth.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.local.json", true);
-
-// Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -18,25 +19,61 @@ builder.Services.AddCors();
 var azureConfig = builder.Configuration.GetSection(AzureConfig.SectionName).Get<AzureConfig>();
 ArgumentNullException.ThrowIfNull(azureConfig, nameof(azureConfig));
 
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+var useLocalAuth = builder.Environment.IsDevelopment();
+var defaultPolicyName = useLocalAuth ? LocalAuthOptions.SchemeName : OpenIdConnectDefaults.AuthenticationScheme;
+var authBuilder = builder.Services.AddAuthentication(defaultPolicyName);
+
+authBuilder
     .AddCookie()
-    .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, x =>
+    .AddScheme<LocalAuthOptions, LocalAuthHandler>(LocalAuthOptions.SchemeName, opts => { });
+
+if (!useLocalAuth)
+{
+    authBuilder.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, x =>
     {
         x.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         x.ClientId = azureConfig.ClientId;
         x.ClientSecret = azureConfig.ClientSecret;
         x.Authority = $"https://login.microsoftonline.com/{azureConfig.TenantId}";
 
+        x.Events.OnMessageReceived = context =>
+        {
+            return Task.CompletedTask;
+        };
+
+        x.Events.OnTokenResponseReceived = context =>
+        {
+            return Task.CompletedTask;
+        };
+
+        x.Events.OnAuthorizationCodeReceived = context =>
+        {
+            return Task.CompletedTask;
+        };
+
+        x.Events.OnTokenValidated = async context =>
+        {
+            // Save user
+            var cosmos = context.HttpContext.RequestServices.GetRequiredService<CosmosDbService>();
+            var userEmail = context.Principal.Identity.Name;
+            var existingUserResult = await cosmos.Get<User>(userEmail, CosmosDbService.UserInfo);
+            if (existingUserResult.IsNotFound)
+            {
+                await cosmos.Upsert<User>(new User { Email = userEmail, Id = userEmail }, CosmosDbService.UserInfo);
+            }
+        };
+
         x.Events.OnAuthenticationFailed = context =>
         {
             return Task.CompletedTask;
         };
     });
+}
 
 builder.Services.AddAuthorization(config =>
 {
     var defaultPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-    config.AddPolicy("AzureAd", defaultPolicy);
+    config.AddPolicy(defaultPolicyName, defaultPolicy);
 
     config.DefaultPolicy = defaultPolicy;
     config.FallbackPolicy = defaultPolicy;
@@ -58,11 +95,10 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // Do "vite watch" and build in container so it's like Prod.
-
     app.UseSwagger();
     app.UseSwaggerUI();
-    //app.UseCors(t => t.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
+
+    app.UseCors(x => x.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
 }
 
 app.UseHttpsRedirection();
@@ -72,21 +108,26 @@ app.UseAuthorization();
 
 app.UseFileServer();
 
-app.MapGet("snippets",  async  ([FromServices] CosmosDbService cosmos) =>
+app.MapGet("api/snippets", async ([FromServices] CosmosDbService cosmos) =>
 {
-    var snippets = await cosmos.Get<Snippet>();
-    return snippets;
+    var snippets = await cosmos.GetAll<Snippet>(CosmosDbService.SnippetInfo);
+    if (!snippets.Success)
+        return Results.Problem(snippets.Error);
+
+    return Results.Ok(snippets.Value);
 }).RequireAuthorization();
 
-app.MapPost("snippets", async (Snippet snippet, [FromServices] CosmosDbService cosmos) =>
+app.MapPost("api/snippets", async (Snippet snippet, [FromServices] CosmosDbService cosmos, HttpContext context) =>
 {
-    await cosmos.Upsert(snippet);
+    var userEmail = context.User.Identity.Name;
+    snippet.Email = userEmail;
+    await cosmos.Upsert(snippet, CosmosDbService.SnippetInfo);
     return Results.Ok();
-}).RequireAuthorization(); ;
+}).RequireAuthorization();
 
-app.MapDelete("snippets/{language}/{id}",  async (string language, string id, [FromServices] CosmosDbService cosmos) =>
+app.MapDelete("api/snippets/{language}/{id}", async (string language, string id, [FromServices] CosmosDbService cosmos) =>
 {
-    await cosmos.Delete(id, language);
+    await cosmos.Delete<Snippet>(id, language, CosmosDbService.SnippetInfo);
     return Results.Ok();
 }).RequireAuthorization();
 
@@ -95,7 +136,10 @@ app.Run();
 
 // TODO: Lol date only?
 // Not quite working in Net 7, pretty sure it's fixed in 8.
-public record Snippet(string Id, string Title, string Code, string LanguageId, int Upvotes, string CreatedOn, string ModifiedOn);  //TODO: Add comments?
+public record Snippet(string Id, string Title, string Code, string LanguageId, int Upvotes, string CreatedOn, string ModifiedOn)
+{
+    public string Email { get; set; }
+}  //TODO: Add comments?
 
 
 public record AzureConfig(string ClientId, string ClientSecret, string TenantId)

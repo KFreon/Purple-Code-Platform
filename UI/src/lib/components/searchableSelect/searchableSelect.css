@@ -6,7 +6,7 @@
 
 input[type='text'] {
   padding: 0.5rem 1rem;
-  border: 1px solid grey;
+  border: 1px solid var(--text-light);
   border-radius: 5px;
   margin-bottom: 0.5rem;
 }
@@ -14,7 +14,7 @@ input[type='text'] {
 .inline-button {
   background-color: transparent;
   padding: 0.5rem 1rem;
-  border: 1px solid grey;
+  border: 1px solid var(--text-light);
   border-radius: 5px;
   text-transform: capitalize;
   min-width: 5rem;
@@ -22,19 +22,19 @@ input[type='text'] {
 }
 
 .inline-button.empty {
-  color: gray;
+  color: var(--text-light);
 }
 
 .popout-options {
   display: none;
   position: absolute;
   z-index: 10;
-  background: white;
-  border: 1px solid darkgray;
+  background: var(--text-primary-inverted);
+  border: 1px solid var(--border-color);
   border-radius: 5px;
   margin-top: 5px;
   padding: 5px 10px;
-  box-shadow: 0 0 5px 0 grey;
+  box-shadow: 0 0 5px 0 var(--text-light);
 }
 
 .scrollable-container {
@@ -55,5 +55,5 @@ li {
 }
 
 li:hover {
-  background: lightblue;
+  background: var(--accent);
 }

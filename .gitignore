@@ -14,3 +14,4 @@ obj
 **/*.user
 PurpleCodePlatform/wwwroot/*
 PurpleCodePlatform/appsettings.local.json
+UI/build

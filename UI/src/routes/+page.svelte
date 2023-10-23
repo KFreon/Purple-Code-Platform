@@ -12,7 +12,7 @@
 
   onMount(() => {
     // Get data
-    promise = fetch('/snippets')
+    promise = fetch('api/snippets')
       .then(resp => resp.json())
       .then(x => {
         cards = x;
@@ -20,7 +20,7 @@
       });
   });
 
-	const getEmptyCardData = ():Data => ({
+	const getEmptyCardData = (): Data => ({
 		id: new Date().toISOString(),
 		languageId: 'plaintext',
 		upvotes: 0,
@@ -28,7 +28,8 @@
 		comments: [],
 		createdOn: new Date().toLocaleDateString('en-au', {year: 'numeric', month: '2-digit', day: '2-digit'}),
 		modifiedOn: new Date().toLocaleDateString('en-au', {year: 'numeric', month: '2-digit', day: '2-digit'}),
-		title: ''
+		title: '',
+		email: ''
 	});
 
 	function addNewSnippet() {
@@ -38,7 +39,7 @@
 	function deleteSnippet(data: Data) {
 		cards = cards.filter((x) => x.title !== data.title);
 
-		promise = fetch(`/snippets/${data.languageId}/{${data.id}}`, {
+		promise = fetch(`api/snippets/${data.languageId}/{${data.id}}`, {
       method: 'DELETE',
       headers: {
         "content-type": 'application/json'
@@ -49,7 +50,7 @@
   function saveSnippet(snippet: Data) {
     snippet.id = snippet.title;
 		snippet.modifiedOn = new Date().toLocaleDateString('en-au', {year: 'numeric', month: '2-digit', day: '2-digit'});
-    promise = fetch('/snippets', {
+    promise = fetch('api/snippets', {
       method: 'POST',
       body: JSON.stringify(snippet),
       headers: {
@@ -70,22 +71,31 @@
 
 		return result;
 	}
+
+	function toggleTheme() {
+		if ($store.theme === 'light'){
+			$store.theme = 'dark';
+		} else {
+			$store.theme = 'light';
+		}
+	}
 </script>
 
-<div class="main-container">
+<div class={"main-container " + $store.theme}>
 	<div class="header">
 		<h1>Purple Code Platform</h1>
 		<div>
 			<p>We write so much code, but sometimes we lose track of the good bits.</p>
 			<p>Here we can save the bits that others (or just us) might want to use again later.</p>
 		</div>
+		<button on:click={() => toggleTheme()} class='theme-toggle'>😎</button>
 	</div>
 
 	{#await promise}
   <div class='loading'>
     <p>🍵</p>
   </div>
-  {:then resp} 
+  {:then resp}  
 	<div class='actions-container'>
 		<button class="new-button" on:click={addNewSnippet}>Add new</button>
 		{#if cards.length > 0}

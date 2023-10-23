@@ -15,7 +15,7 @@
   flex-direction: column;
   align-items: center;
   padding: 0;
-  background-color: rgba(211, 211, 211, 0.212);
+  background-color: var(--background);
 }
 
 .code-scroller {
@@ -24,7 +24,7 @@
   width: 100%;
   height: 100%;
   padding: 0 1rem;
-  box-shadow: 0 0 5px 0 black inset;
+  box-shadow: 0 0 5px 0 var(--text-primary) inset;
 }
 
 .code-area {
@@ -57,13 +57,13 @@
 .actions-container > input[type='text'] {
   padding: 0.5rem 1rem;
   border-radius: 5px;
-  border: 1px solid grey;
+  border: 1px solid var(--border-color);
 }
 
 .new-button {
   padding: 1rem;
-  background-color: purple;
-  color: white;
+  background-color: var(--main-button);
+  color: var(--text-primary-inverted);
   border: none;
   border-radius: 5px;
   margin-right: 1rem;;
@@ -88,14 +88,26 @@
   animation-direction: alternate;
 }
 
-
-
 @keyframes loadingAnim {
   0% {
-    transform: scale(1);
+    transform: scale(1) rotate3d(0,0,0);
   }
 
   100% {
-    transform: scale(3);
+    transform: scale(5) rotate3d(360, 360, 360);
   }
+}
+
+.theme-toggle {
+  position: absolute;
+  right: 1rem;
+  top: 1.5rem;
+  font-size: 4rem;
+  border: none;
+  background: transparent;
+  transition: all 0.2s;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.2)
 }
